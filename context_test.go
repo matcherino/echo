@@ -51,6 +51,10 @@ func TestContext(t *testing.T) {
 	// Socket
 	assert.Nil(t, c.Socket())
 
+	// ParamNames
+	c.pnames = []string{"user_id", "id"}
+	assert.EqualValues(t, []string{"user_id", "id"}, c.ParamNames())
+
 	// Param by id
 	c.pnames = []string{"id"}
 	c.pvalues = []string{"1"}
@@ -63,19 +67,15 @@ func TestContext(t *testing.T) {
 	c.Set("user", "Joe")
 	assert.Equal(t, "Joe", c.Get("user"))
 
-	//------
 	// Bind
-	//------
-
-	// JSON
-	testBind(t, c, "application/json")
-
-	// XML
-	c.request, _ = http.NewRequest(POST, "/", strings.NewReader(userXML))
-	testBind(t, c, ApplicationXML)
-
-	// Unsupported
-	testBind(t, c, "")
+	c.request, _ = http.NewRequest(POST, "/", strings.NewReader(userJSON))
+	c.request.Header.Set(ContentType, ApplicationJSON)
+	u := new(user)
+	err := c.Bind(u)
+	if assert.NoError(t, err) {
+		assert.Equal(t, "1", u.ID)
+		assert.Equal(t, "Joe", u.Name)
+	}
 
 	//--------
 	// Render
@@ -85,7 +85,7 @@ func TestContext(t *testing.T) {
 		templates: template.Must(template.New("hello").Parse("Hello, {{.}}!")),
 	}
 	c.echo.SetRenderer(tpl)
-	err := c.Render(http.StatusOK, "hello", "Joe")
+	err = c.Render(http.StatusOK, "hello", "Joe")
 	if assert.NoError(t, err) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, "Hello, Joe!", rec.Body.String())
@@ -229,6 +229,10 @@ func TestContext(t *testing.T) {
 
 	// reset
 	c.reset(req, NewResponse(httptest.NewRecorder(), e), e)
+
+	// after reset (nil store) set test
+	c.Set("user", "Joe")
+	assert.Equal(t, "Joe", c.Get("user"))
 }
 
 func TestContextPath(t *testing.T) {
@@ -280,14 +284,9 @@ func TestContextNetContext(t *testing.T) {
 	assert.Equal(t, "val", c.Value("key"))
 }
 
-func testBind(t *testing.T, c *Context, ct string) {
-	c.request.Header.Set(ContentType, ct)
-	u := new(user)
-	err := c.Bind(u)
-	if ct == "" {
-		assert.Error(t, UnsupportedMediaType)
-	} else if assert.NoError(t, err) {
-		assert.Equal(t, "1", u.ID)
-		assert.Equal(t, "Joe", u.Name)
-	}
+func TestContextEcho(t *testing.T) {
+	c := new(Context)
+
+	// Should be null when initialized without one
+	assert.Nil(t, c.Echo())
 }

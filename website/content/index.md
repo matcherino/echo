@@ -2,7 +2,7 @@
 title: Index
 ---
 
-# Echo
+# ![Echo](/images/echo.svg) Echo
 
 A fast and unfancy micro web framework for Go.
 
@@ -51,12 +51,44 @@ A fast and unfancy micro web framework for Go.
 
 <iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/1phsG_NPmEOaTVTw6lasK3CeEwBlbkhzAWPiyrBznm1g/pubchart?oid=178095723&amp;format=interactive"></iframe>
 
+## Echo System
+
+### Who's using Echo?
+
+- [LabStack](https://labstack.com)
+- [ShowChampions](https://showchampions.photoserve.co)
+- [deferpanic](https://deferpanic.com)
+- [Center for Open Science](https://cos.io)
+- [SeeSaw Labs](http://www.seesawlabs.com)
+- [Kyäni](http://www.kyani.net)
+- [Carrot Creative](http://carrot.is)
+- [EurekaMetrics](http://eurekametrics.com)
+- [Coursella](https://www.coursella.com)
+- [blue Vanilla](https://www.bleuvanille.fr)
+- [ImPlaces](http://www.implaces.com)
+- [Gomoku](http://gomoku.thoughtsfromplac.es)
+- [DrinkIn](https://drinkin.com)
+- [PodBaby](https://podbaby.me)
+
+### Community created packages around Echo
+
+- [echo-logrus](https://github.com/deoxxa/echo-logrus)
+- [go_middleware](https://github.com/rightscale/go_middleware)
+- [permissions2](https://github.com/xyproto/permissions2)
+- [permissionbolt](https://github.com/xyproto/permissionbolt)
+- [echo-middleware](https://github.com/syntaqx/echo-middleware)
+- [dpecho](https://github.com/deferpanic/dpecho)
+- [echosentry](https://github.com/01walid/echosentry)
+- [go-starter-kit](https://github.com/olebedev/go-starter-kit)
+
+[Want to get listed?](https://github.com/labstack/echo/issues/295)
+
 ## Getting Started
 
 ### Installation
 
 ```sh
-$ go get github.com/labstack/echo
+$ go get gopkg.in/labstack/echo.v1
 ```
 
 ### Hello, World!
@@ -69,8 +101,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/labstack/echo"
-	mw "github.com/labstack/echo/middleware"
+	echo "gopkg.in/labstack/echo.v1"
+	mw "gopkg.in/labstack/echo.v1/middleware"
 )
 
 // Handler

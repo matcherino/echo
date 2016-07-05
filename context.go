@@ -58,6 +58,11 @@ func (c *Context) Socket() *websocket.Conn {
 	return c.socket
 }
 
+// ParamNames returns path parameter names.
+func (c *Context) ParamNames() []string {
+	return c.pnames
+}
+
 // Path returns the registered path for the handler.
 func (c *Context) Path() string {
 	return c.path
@@ -120,7 +125,7 @@ func (c *Context) Bind(i interface{}) error {
 // code. Templates can be registered using `Echo.SetRenderer()`.
 func (c *Context) Render(code int, name string, data interface{}) (err error) {
 	if c.echo.renderer == nil {
-		return RendererNotRegistered
+		return ErrRendererNotRegistered
 	}
 	buf := new(bytes.Buffer)
 	if err = c.echo.renderer.Render(buf, name, data); err != nil {
@@ -154,10 +159,7 @@ func (c *Context) JSON(code int, i interface{}) (err error) {
 	if err != nil {
 		return err
 	}
-	c.response.Header().Set(ContentType, ApplicationJSONCharsetUTF8)
-	c.response.WriteHeader(code)
-	c.response.Write(b)
-	return
+	return c.JSONBlob(code, b)
 }
 
 // JSONIndent sends a JSON response with status code, but it applies prefix and indent to format the output.
@@ -166,14 +168,15 @@ func (c *Context) JSONIndent(code int, i interface{}, prefix string, indent stri
 	if err != nil {
 		return err
 	}
-	c.json(code, b)
-	return
+	return c.JSONBlob(code, b)
 }
 
-func (c *Context) json(code int, b []byte) {
+// JSONBlob sends a JSON blob response with status code.
+func (c *Context) JSONBlob(code int, b []byte) (err error) {
 	c.response.Header().Set(ContentType, ApplicationJSONCharsetUTF8)
 	c.response.WriteHeader(code)
 	c.response.Write(b)
+	return
 }
 
 // JSONP sends a JSONP response with status code. It uses `callback` to construct
@@ -244,7 +247,7 @@ func (c *Context) NoContent(code int) error {
 // Redirect redirects the request using http.Redirect with status code.
 func (c *Context) Redirect(code int, url string) error {
 	if code < http.StatusMultipleChoices || code > http.StatusTemporaryRedirect {
-		return InvalidRedirectCode
+		return ErrInvalidRedirectCode
 	}
 	http.Redirect(c.response, c.request, url, code)
 	return nil

@@ -41,13 +41,7 @@ SetLogOutput sets the output destination for the logger. Default value is `os.St
 
 `echo#SetLogLevel(l log.Level)`
 
-SetLogLevel sets the log level for the logger. Default value is `log.INFO`.
-
-### HTTP2
-
-`echo#HTTP(on bool)`
-
-Enable/disable HTTP2 support.
+SetLogLevel sets the log level for the logger. Default value is `log.FATAL`.
 
 ### Auto index
 
@@ -60,7 +54,7 @@ Enable/disable automatically creating an index page for the directory.
 ```go
 e := echo.New()
 e.AutoIndex(true)
-e.ServerDir("/", "/Users/vr/Projects/echo")
+e.ServeDir("/", "/Users/vr/Projects/echo")
 e.Run(":1323")
 ```
 

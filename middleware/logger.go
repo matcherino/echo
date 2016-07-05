@@ -4,10 +4,15 @@ import (
 	"net"
 	"time"
 
-	"github.com/labstack/echo"
 	"github.com/labstack/gommon/color"
+	echo "gopkg.in/labstack/echo.v1"
 )
 
+const (
+	format = "%s %s %s %s %s %d"
+)
+
+// Logger returns a Middleware that logs requests.
 func Logger() echo.MiddlewareFunc {
 	return func(h echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
@@ -47,7 +52,7 @@ func Logger() echo.MiddlewareFunc {
 				code = color.Cyan(n)
 			}
 
-			logger.Info("%s %s %s %s %s %d", remoteAddr, method, path, code, stop.Sub(start), size)
+			logger.Printf(format, remoteAddr, method, path, code, stop.Sub(start), size)
 			return nil
 		}
 	}

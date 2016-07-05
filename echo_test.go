@@ -39,6 +39,24 @@ func TestEcho(t *testing.T) {
 	// DefaultHTTPErrorHandler
 	e.DefaultHTTPErrorHandler(errors.New("error"), c)
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+
+	// Autoindex
+	e.AutoIndex(true)
+	assert.True(t, e.autoIndex)
+}
+
+func TestListDir(t *testing.T) {
+	e := New()
+	req, _ := http.NewRequest(GET, "/", nil)
+	rec := httptest.NewRecorder()
+	c := NewContext(req, NewResponse(rec, e), e)
+	fs := http.Dir("_fixture")
+	f, err := fs.Open("images")
+	assert.NoError(t, err)
+	if assert.NoError(t, listDir(f, c)) {
+		assert.Equal(t, TextHTMLCharsetUTF8, rec.Header().Get(ContentType))
+		assert.Equal(t, "<pre>\n<a href=\"walle.png\" style=\"color: #212121;\">walle.png</a>\n</pre>\n", rec.Body.String())
+	}
 }
 
 func TestEchoIndex(t *testing.T) {
@@ -274,7 +292,7 @@ func TestEchoWebSocket(t *testing.T) {
 	url := fmt.Sprintf("ws://%s/ws", addr)
 	ws, err := websocket.Dial(url, "", origin)
 	if assert.NoError(t, err) {
-		ws.Write([]byte("test"))
+		ws.Write([]byte("test\n"))
 		defer ws.Close()
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(ws)
@@ -399,6 +417,8 @@ func TestEchoHTTPError(t *testing.T) {
 	he := NewHTTPError(http.StatusBadRequest, m)
 	assert.Equal(t, http.StatusBadRequest, he.Code())
 	assert.Equal(t, m, he.Error())
+	he.SetCode(http.StatusOK)
+	assert.Equal(t, http.StatusOK, he.Code())
 }
 
 func TestEchoServer(t *testing.T) {
@@ -423,6 +443,31 @@ func TestEchoHook(t *testing.T) {
 	w := httptest.NewRecorder()
 	e.ServeHTTP(w, r)
 	assert.Equal(t, r.URL.Path, "/test")
+}
+
+func TestEchoUse(t *testing.T) {
+	e := New()
+	buf := new(bytes.Buffer)
+	mw1 := MiddlewareFunc(func(h HandlerFunc) HandlerFunc {
+		return func(c *Context) error {
+			buf.WriteString("mw1")
+			return h(c)
+		}
+	})
+	mw2 := MiddlewareFunc(func(h HandlerFunc) HandlerFunc {
+		return func(c *Context) error {
+			buf.WriteString("mw2")
+			return h(c)
+		}
+	})
+	e.Get("/", Use(func(c *Context) error {
+		return c.String(http.StatusOK, "Okay")
+	}, mw1, mw2))
+
+	r, _ := http.NewRequest(GET, "/", nil)
+	w := httptest.NewRecorder()
+	e.ServeHTTP(w, r)
+	assert.Equal(t, "mw1mw2", buf.String())
 }
 
 func testMethod(t *testing.T, method, path string, e *Echo) {
