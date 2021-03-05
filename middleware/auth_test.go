@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	echo "gopkg.in/labstack/echo.v1"
+	echo "github.com/matcherino/echo"
 )
 
 func TestBasicAuth(t *testing.T) {

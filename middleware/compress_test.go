@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	echo "gopkg.in/labstack/echo.v1"
+	echo "github.com/matcherino/echo"
 )
 
 type closeNotifyingRecorder struct {

@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	echo "gopkg.in/labstack/echo.v1"
+	echo "github.com/matcherino/echo"
 )
 
 type (

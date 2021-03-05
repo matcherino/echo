@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/labstack/gommon/color"
-	echo "gopkg.in/labstack/echo.v1"
+	echo "github.com/matcherino/echo"
 )
 
 const (
